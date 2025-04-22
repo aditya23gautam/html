@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz App</title>
+  <style>
+    :root {
+      --bg: #f9f9f9;
+      --text: #333;
+      --card: #fff;
+      --primary: #0077ff;
+      --correct: #4caf50;
+      --wrong: #f44336;
+    }
+    body.dark {
+      --bg: #121212;
+      --text: #eee;
+      --card: #1e1e1e;
+    }
+    * {
+      font-family: sans-serif;
+      box-sizing: border-box;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: var(--card);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .question {
+      margin: 20px 0;
+      font-size: 18px;
+    }
+    .options button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      background: var(--bg);
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .options button.correct {
+      background-color: var(--correct);
+      color: white;
+    }
+    .options button.wrong {
+      background-color: var(--wrong);
+      color: white;
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+    .btns {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .btns button {
+      padding: 10px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz App</h1>
+    <div class="info">
+      <span id="question-number">Question 1</span>
+      <span id="timer">Timer: 15s</span>
+    </div>
+    <div class="question" id="question-text"></div>
+    <div class="options" id="options"></div>
+    <div class="btns">
+      <button onclick="nextQuestion()">Next</button>
+      <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    </div>
+    <h2 id="result" style="display:none;"></h2>
+    <div class="btns">
+      <button onclick="restartQuiz()">Restart Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "What is the capital of India?",
+        options: ["Delhi", "Mumbai", "Kolkata", "Chennai"],
+        answer: "Delhi"
+      },
+      {
+        question: "Which language runs in a web browser?",
+        options: ["Java", "C", "Python", "JavaScript"],
+        answer: "JavaScript"
+      },
+      {
+        question: "What does HTML stand for?",
+        options: ["Hyper Trainer Marking Language", "Hyper Text Markup Language", "Hyper Text Marketing Language", "Hyper Tool Multi Language"],
+        answer: "Hyper Text Markup Language"
+      },
+      {
+        question: "What is 2 + 2 * 2?",
+        options: ["6", "8", "4", "10"],
+        answer: "6"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      document.getElementById("question-text").textContent = q.question;
+      document.getElementById("question-number").textContent = `Question ${currentQuestion + 1}`;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(btn, q.answer);
+        optionsDiv.appendChild(btn);
+      });
+      resetTimer();
+    }
+
+    function checkAnswer(button, correctAnswer) {
+      const buttons = document.querySelectorAll(".options button");
+      buttons.forEach(btn => btn.disabled = true);
+      if (button.textContent === correctAnswer) {
+        button.classList.add("correct");
+        score++;
+      } else {
+        button.classList.add("wrong");
+        buttons.forEach(btn => {
+          if (btn.textContent === correctAnswer) btn.classList.add("correct");
+        });
+      }
+      clearInterval(timer);
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        document.getElementById("result").style.display = "block";
+        document.getElementById("result").textContent = `Your score: ${score}/${quizData.length}`;
+        document.getElementById("question-text").style.display = "none";
+        document.getElementById("options").style.display = "none";
+        document.querySelector(".info").style.display = "none";
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timeLeft = 15;
+      document.getElementById("timer").textContent = `Timer: ${timeLeft}s`;
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `Timer: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          nextQuestion();
+        }
+      }, 1000);
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      document.getElementById("result").style.display = "none";
+      document.getElementById("question-text").style.display = "block";
+      document.getElementById("options").style.display = "block";
+      document.querySelector(".info").style.display = "flex";
+      loadQuestion();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    // Start the quiz
+    loadQuestion();
+  </script>
+</body>
+</html>
