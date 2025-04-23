@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Snake Game with Speed Control</title>
+  <style>
+    canvas {
+      background-color: #000;
+      display: block;
+      margin: 20px auto;
+      border: 2px solid #fff;
+    }
+    body {
+      background: #1a1a1a;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    select {
+      font-size: 16px;
+      padding: 5px 10px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Select Speed and Press 'S' to Start</h2>
+  <select id="speedSelect">
+    <option value="200">Slow</option>
+    <option value="120" selected>Medium</option>
+    <option value="60">Fast</option>
+  </select>
+
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const speedSelect = document.getElementById("speedSelect");
+
+    const box = 20;
+    const canvasSize = 400;
+    let snake = [];
+    let direction = "";
+    let game = null;
+    let food;
+    let gameStarted = false;
+
+    function initGame() {
+      snake = [];
+      snake[0] = { x: 9 * box, y: 9 * box };
+      direction = "RIGHT";
+      food = {
+        x: Math.floor(Math.random() * (canvasSize / box)) * box,
+        y: Math.floor(Math.random() * (canvasSize / box)) * box,
+      };
+
+      const speed = parseInt(speedSelect.value);
+      clearInterval(game);
+      game = setInterval(draw, speed);
+      gameStarted = true;
+      speedSelect.disabled = true; // Disable dropdown after game starts
+    }
+
+    function draw() {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? "#0f0" : "#fff";
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+      }
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(food.x, food.y, box, box);
+
+      let headX = snake[0].x;
+      let headY = snake[0].y;
+
+      if (direction === "LEFT") headX -= box;
+      if (direction === "UP") headY -= box;
+      if (direction === "RIGHT") headX += box;
+      if (direction === "DOWN") headY += box;
+
+      if (
+        headX < 0 || headY < 0 ||
+        headX >= canvasSize || headY >= canvasSize ||
+        collision({ x: headX, y: headY }, snake)
+      ) {
+        clearInterval(game);
+        alert("Game Over!");
+        gameStarted = false;
+        speedSelect.disabled = false; // Enable again after game over
+        return;
+      }
+
+      let newHead = { x: headX, y: headY };
+
+      if (headX === food.x && headY === food.y) {
+        food = {
+          x: Math.floor(Math.random() * (canvasSize / box)) * box,
+          y: Math.floor(Math.random() * (canvasSize / box)) * box,
+        };
+      } else {
+        snake.pop();
+      }
+
+      snake.unshift(newHead);
+    }
+
+    function collision(head, array) {
+      for (let i = 0; i < array.length; i++) {
+        if (head.x === array[i].x && head.y === array[i].y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.key === "s" || e.key === "S") && !gameStarted) {
+        initGame();
+      }
+
+      if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+      else if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+      else if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+      else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+    });
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Snake Game with Speed Control</title>
+  <style>
+    canvas {
+      background-color: #000;
+      display: block;
+      margin: 20px auto;
+      border: 2px solid #fff;
+    }
+    body {
+      background: #1a1a1a;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    select {
+      font-size: 16px;
+      padding: 5px 10px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Select Speed and Press 'S' to Start</h2>
+  <select id="speedSelect">
+    <option value="200">Slow</option>
+    <option value="120" selected>Medium</option>
+    <option value="60">Fast</option>
+  </select>
+
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const speedSelect = document.getElementById("speedSelect");
+
+    const box = 20;
+    const canvasSize = 400;
+    let snake = [];
+    let direction = "";
+    let game = null;
+    let food;
+    let gameStarted = false;
+
+    function initGame() {
+      snake = [];
+      snake[0] = { x: 9 * box, y: 9 * box };
+      direction = "RIGHT";
+      food = {
+        x: Math.floor(Math.random() * (canvasSize / box)) * box,
+        y: Math.floor(Math.random() * (canvasSize / box)) * box,
+      };
+
+      const speed = parseInt(speedSelect.value);
+      clearInterval(game);
+      game = setInterval(draw, speed);
+      gameStarted = true;
+      speedSelect.disabled = true; // Disable dropdown after game starts
+    }
+
+    function draw() {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? "#0f0" : "#fff";
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+      }
+
+      ctx.fillStyle = "red";
+      ctx.fillRect(food.x, food.y, box, box);
+
+      let headX = snake[0].x;
+      let headY = snake[0].y;
+
+      if (direction === "LEFT") headX -= box;
+      if (direction === "UP") headY -= box;
+      if (direction === "RIGHT") headX += box;
+      if (direction === "DOWN") headY += box;
+
+      if (
+        headX < 0 || headY < 0 ||
+        headX >= canvasSize || headY >= canvasSize ||
+        collision({ x: headX, y: headY }, snake)
+      ) {
+        clearInterval(game);
+        alert("Game Over!");
+        gameStarted = false;
+        speedSelect.disabled = false; // Enable again after game over
+        return;
+      }
+
+      let newHead = { x: headX, y: headY };
+
+      if (headX === food.x && headY === food.y) {
+        food = {
+          x: Math.floor(Math.random() * (canvasSize / box)) * box,
+          y: Math.floor(Math.random() * (canvasSize / box)) * box,
+        };
+      } else {
+        snake.pop();
+      }
+
+      snake.unshift(newHead);
+    }
+
+    function collision(head, array) {
+      for (let i = 0; i < array.length; i++) {
+        if (head.x === array[i].x && head.y === array[i].y) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.key === "s" || e.key === "S") && !gameStarted) {
+        initGame();
+      }
+
+      if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+      else if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+      else if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+      else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+    });
+  </script>
+</body>
+</html>
